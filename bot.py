@@ -137,11 +137,11 @@ async def setup_bgm() -> (discord.Channel, MultiStream):
     assert isinstance(voice_client, discord.VoiceClient)
 
     try:
-        blksize = os.stat('stream.raw').st_blksize
+        blksize = os.stat('bgm/stream.raw').st_blksize
     except AttributeError:
         blksize = 4096
 
-    audio = open('stream.raw', 'rb', 0)
+    audio = open('bgm/stream.raw', 'rb', 0)
     stream = MultiStream().add_stream(CircularStream(audio, 1000 * blksize))
     player = voice_client.create_stream_player(stream)  # type: discord.voice_client.StreamPlayer
     assert isinstance(player, discord.voice_client.StreamPlayer)
