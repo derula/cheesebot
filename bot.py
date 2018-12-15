@@ -81,7 +81,7 @@ class SEPlayer(threading.Thread):
         self.__stream = stream
         self.__resume = threading.Event()
         self.__dying = threading.Event()
-        self.__picker = Picker(lambda: glob.glob('se/*.raw'))
+        self.__picker = Picker(lambda: glob.glob('data/se/*.raw'))
 
         for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
             old_handler = signal.getsignal(sig)
@@ -139,11 +139,11 @@ async def setup_bgm() -> (discord.Channel, MultiStream):
     assert isinstance(voice_client, discord.VoiceClient)
 
     try:
-        blksize = os.stat('bgm/stream.raw').st_blksize
+        blksize = os.stat('data/bgm/stream.raw').st_blksize
     except AttributeError:
         blksize = 4096
 
-    audio = open('bgm/stream.raw', 'rb', 0)
+    audio = open('data/bgm/stream.raw', 'rb', 0)
     stream = MultiStream().add_stream(CircularStream(audio, 1000 * blksize))
     player = voice_client.create_stream_player(stream)  # type: discord.voice_client.StreamPlayer
     assert isinstance(player, discord.voice_client.StreamPlayer)
@@ -155,7 +155,7 @@ def load_phrases():
     Phrase = tinydb.Query()
     return map(lambda row: row['content'], phrases.search(Phrase.language == 'odan'))
 
-db = tinydb.TinyDB('db/storage.json')
+db = tinydb.TinyDB('data/storage.json')
 phrases = db.table('phrases')
 phrase_picker = Picker(load_phrases)
 
