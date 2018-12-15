@@ -62,7 +62,7 @@ async def on_ready():
     channel, stream = await setup_bgm()
     if channel is not None:
         print('Now playing spoopy music in {}'.format(channel.name))
-        SEPlayer(stream).start()
+        SEPlayer(stream, 'data/se').start()
     else:
         print('Ch\'sebur\'gah voice room not found.')
 

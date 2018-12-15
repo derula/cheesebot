@@ -6,12 +6,12 @@ from threading import Thread, Event, Timer
 from . import Picker, MultiStream
 
 class SEPlayer(Thread):
-    def __init__(self, stream: MultiStream, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, stream: MultiStream, path: str):
+        super().__init__()
         self.__stream = stream
         self.__resume = Event()
         self.__dying = Event()
-        self.__picker = Picker(lambda: glob('data/se/*.raw'))
+        self.__picker = Picker(lambda: glob('{}/*.raw'.format(path)))
 
         for sig in (SIGTERM, SIGHUP, SIGINT):
             old_handler = getsignal(sig)
