@@ -1,4 +1,3 @@
-import discord
 import asyncio
 import audioop
 import glob
@@ -10,6 +9,9 @@ import io
 import os
 import signal
 import threading
+
+import discord
+import tinydb
 
 class CircularStream(io.BufferedReader):
     def read(self, size=-1):
@@ -150,13 +152,12 @@ async def setup_bgm() -> (discord.Channel, MultiStream):
     return channel, stream
 
 def load_phrases():
-    phrases = []
-    with open('phrases.txt', 'r') as f:
-        for line in f:
-            line = line.lstrip('\ufeff').strip()
-            if len(line) > 0 and not line.startswith('#'):
-                phrases.append(line)
-    return phrases
+    Phrase = tinydb.Query()
+    return map(lambda row: row['content'], phrases.search(Phrase.language == 'odan'))
+
+db = tinydb.TinyDB('db/storage.json')
+phrases = db.table('phrases')
+phrase_picker = Picker(load_phrases)
 
 client = discord.Client()
 
@@ -169,8 +170,6 @@ async def on_ready():
         SEPlayer(stream).start()
     else:
         print('Ch\'sebur\'gah voice room not found.')
-
-phrase_picker = Picker(load_phrases)
 
 @client.event
 async def on_message(message):

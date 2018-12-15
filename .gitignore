@@ -1,6 +1,7 @@
 /.vscode
 /local
 
-/se/*
 /bgm/*
+/db/*
+/se/*
 !.gitkeep
