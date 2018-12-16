@@ -44,7 +44,6 @@ class SEPlayer(Thread):
         if se is None:
             return
 
-        print('Playing {}'.format(se))
         with open(se, 'rb') as stream:
             self.__stream.add_stream(stream, self.__resume.set)
             if not self.__wait():
