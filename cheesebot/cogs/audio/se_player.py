@@ -1,4 +1,3 @@
-from glob import glob
 from random import randint
 from signal import getsignal, signal, SIGTERM, SIGINT
 from threading import Thread, Event, Timer
