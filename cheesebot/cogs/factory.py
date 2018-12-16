@@ -21,5 +21,5 @@ class CogFactory():
         )
 
     def __create_mention_cog(self) -> MentionCog:
-        from .mention import PhrasePicker
+        from .cogs import PhrasePicker
         return MentionCog(self.__bot, PhrasePicker(self.__bot.db.table('phrases')))
