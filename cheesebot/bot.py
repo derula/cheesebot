@@ -1,35 +1,35 @@
 import asyncio
 from os import stat
 
-from discord import Channel, ChannelType, Client, VoiceClient, utils
+from discord import Channel, ChannelType, VoiceClient, utils
+from discord.ext import commands
 from discord.voice_client import StreamPlayer
 from tinydb import TinyDB, Query
 
 from . import CircularStream, Config, PhrasePicker, SEPicker, SEPlayer, MultiStream
 
-class CheeseBot():
+class CheeseBot(commands.Bot):
     def __init__(self, data_path: str):
         db = TinyDB('{}/storage.json'.format(data_path))
-        phrase_picker = PhrasePicker(db.table('phrases'))
         self.__config = Config(db.table('config'))
-        self.__client = client = Client()
+        self.__data_path = data_path
+        self.__phrase_picker = PhrasePicker(db.table('phrases'))
+        super().__init__('🧀')
 
-        @client.event
-        async def on_ready():
-            print('Logged in as {} (ID {})'.format(client.user, client.user.id))
-            channel, stream = await self.setup_bgm(data_path)
-            if channel is not None:
-                print('Now playing spoopy music in {}'.format(channel.name))
-                SEPlayer(stream, SEPicker('{}/se'.format(data_path))).start()
-            else:
-                print('Voice channel "{}" not found.'.format(self.__config['voice_channel']))
+    async def on_ready(self):
+        print('Logged in as {} (ID {})'.format(self.user, self.user.id))
+        channel, stream = await self.__setup_bgm()
+        if channel is not None:
+            print('Now playing spoopy music in {}'.format(channel.name))
+            SEPlayer(stream, SEPicker('{}/se'.format(self.__data_path))).start()
+        else:
+            print('Voice channel "{}" not found.'.format(self.__config['voice_channel']))
 
-        @client.event
-        async def on_message(message):
-            if message.content.find(client.user.mention) >= 0:
-                await client.send_message(message.channel, phrase_picker.pick())
+    async def on_message(self, message):
+        if message.content.find(self.user.mention) >= 0:
+            await self.send_message(message.channel, self.__phrase_picker.pick())
 
-    async def setup_bgm(self, data_path: str) -> (Channel, MultiStream):
+    async def __setup_bgm(self) -> (Channel, MultiStream):
         channel = None  # type: discord.Channel
 
         for server in self.__client.servers:
@@ -47,7 +47,7 @@ class CheeseBot():
         voice_client = await self.__client.join_voice_channel(channel)  # type: discord.VoiceClient
         assert isinstance(voice_client, VoiceClient)
 
-        filename = '{}/bgm/stream.raw'.format(data_path)
+        filename = '{}/bgm/stream.raw'.format(self.__data_path)
 
         try:
             blksize = stat(filename).st_blksize
@@ -63,4 +63,4 @@ class CheeseBot():
         return channel, stream
 
     def run(self):
-        self.__client.run(self.__config['discord_token'])
+        super().run(self.__config['discord_token'])
