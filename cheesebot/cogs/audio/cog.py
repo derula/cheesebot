@@ -6,16 +6,9 @@ from discord.voice_client import StreamPlayer
 
 from .. import CheeseBot, CheeseCog
 from ... import Picker
+from . import SEPicker
 from .se_player import SEPlayer
 from .streams import CircularStream, MultiStream
-
-class SEPicker(Picker):
-    def __init__(self, path: str) -> None:
-        self.__path = path
-        super().__init__()
-
-    def _all_items(self):
-        return glob('{}/*.raw'.format(self.__path))
 
 class AudioCog(CheeseCog):
     def __init__(self, bot: CheeseBot, voice_channel: str, bgm: str, se_picker: SEPicker):

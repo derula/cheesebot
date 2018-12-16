@@ -1,6 +1,4 @@
 from .. import CheeseBot, Picker
-from .audio import SEPicker, AudioCog
-from .mention import PhrasePicker, MentionCog
 
 class CheeseCog():
     def __init__(self, bot: CheeseBot) -> None:
@@ -9,3 +7,6 @@ class CheeseCog():
     @property
     def bot(self):
         return self.__bot
+
+from .audio import SEPicker, AudioCog
+from .mention import PhrasePicker, MentionCog

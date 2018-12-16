@@ -2,13 +2,13 @@ from discord.ext.commands import Bot
 from tinydb import TinyDB, Query
 
 from . import Config
-from .cogs import PhrasePicker, MentionCog, SEPicker, AudioCog
 
 class CheeseBot(Bot):
     def __init__(self, data_path: str):
         db = TinyDB('{}/storage.json'.format(data_path))
         self.__config = Config(db.table('config'))
         super().__init__('🧀')
+        from .cogs import PhrasePicker, MentionCog, SEPicker, AudioCog
         self.add_cog(MentionCog, PhrasePicker(db.table('phrases')))
         self.add_cog(
             AudioCog,
