@@ -1,5 +1,5 @@
 from glob import glob
-from .. import CheeseBot, CheeseCog, Picker
+from .. import CheeseCog, Picker
 
 class SEPicker(Picker):
     def __init__(self, path: str) -> None:

@@ -4,14 +4,14 @@ from os import stat
 from discord import Channel, ChannelType, VoiceClient, utils
 from discord.voice_client import StreamPlayer
 
-from .. import CheeseBot, CheeseCog
+from .. import CheeseCog
 from ... import Picker
 from . import SEPicker
 from .se_player import SEPlayer
 from .streams import CircularStream, MultiStream
 
 class AudioCog(CheeseCog):
-    def __init__(self, bot: CheeseBot, voice_channel: str, bgm: str, se_picker: SEPicker):
+    def __init__(self, bot: 'cheesebot.CheeseBot', voice_channel: str, bgm: str, se_picker: SEPicker):
         super().__init__(bot)
         self.__voice_channel = voice_channel
         self.__bgm = bgm

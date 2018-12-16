@@ -1,7 +1,7 @@
 from tinydb import Query
 from tinydb.database import Table
 
-from . import CheeseBot, CheeseCog
+from . import CheeseCog
 from .. import Picker
 
 Phrase = Query()
@@ -15,7 +15,7 @@ class PhrasePicker(Picker):
         return map(lambda row: row['content'], self.__table.search(Phrase.language == 'odan'))
 
 class MentionCog(CheeseCog):
-    def __init__(self, bot: CheeseBot, phrase_picker: PhrasePicker):
+    def __init__(self, bot: 'cheesebot.CheeseBot', phrase_picker: PhrasePicker):
         super().__init__(bot)
         self.__phrase_picker = phrase_picker
 
