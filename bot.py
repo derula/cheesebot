@@ -3,7 +3,7 @@ import os
 import discord
 import tinydb
 
-from cheesebot import Config, Picker, SEPlayer, CircularStream, MultiStream
+from cheesebot import Config, PhrasePicker, SEPicker, SEPlayer, CircularStream, MultiStream
 
 async def setup_bgm() -> (discord.Channel, MultiStream):
     channel = None  # type: discord.Channel
@@ -36,15 +36,9 @@ async def setup_bgm() -> (discord.Channel, MultiStream):
 
     return channel, stream
 
-def load_phrases():
-    Phrase = tinydb.Query()
-    return map(lambda row: row['content'], phrases.search(Phrase.language == 'odan'))
-
 db = tinydb.TinyDB('data/storage.json')
-phrases = db.table('phrases')
-phrase_picker = Picker(load_phrases)
+phrase_picker = PhrasePicker(db.table('phrases'))
 config = Config(db.table('config'))
-
 client = discord.Client()
 
 @client.event
@@ -53,7 +47,7 @@ async def on_ready():
     channel, stream = await setup_bgm()
     if channel is not None:
         print('Now playing spoopy music in {}'.format(channel.name))
-        SEPlayer(stream, 'data/se').start()
+        SEPlayer(stream, SEPicker('data/se')).start()
     else:
         print('Voice channel "{}" not found.'.format(config['voice_channel']))
 

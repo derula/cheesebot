@@ -1,13 +1,20 @@
+from glob import glob
 from math import ceil
 from random import choice
+from typing import Any
+
+from tinydb import Query
+from tinydb.database import Table
 
 class Picker():
-    def __init__(self, all_items):
+    def __init__(self) -> None:
         self.__last_used = []
-        self.__all_items = all_items
 
-    def pick(self):
-        all_items = set(self.__all_items())
+    def _all_items(self) -> list:
+        raise NotImplementedError('Don\'t use Picker directly, use subclasses.')
+
+    def pick(self) -> Any:
+        all_items = set(self._all_items())
 
         # No sound effect found :(
         if len(all_items) == 0:
@@ -28,3 +35,21 @@ class Picker():
         self.__last_used.append(item)
 
         return item
+
+Phrase = Query()
+
+class PhrasePicker(Picker):
+    def __init__(self, table: Table) -> None:
+        self.__table = table
+        super().__init__()
+
+    def _all_items(self):
+        return map(lambda row: row['content'], self.__table.search(Phrase.language == 'odan'))
+
+class SEPicker(Picker):
+    def __init__(self, path: str) -> None:
+        self.__path = path
+        super().__init__()
+
+    def _all_items(self):
+        return glob('{}/*.raw'.format(self.__path))

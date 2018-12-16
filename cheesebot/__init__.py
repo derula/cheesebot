@@ -1,4 +1,4 @@
 from .config import Config
-from .picker import Picker
+from .pickers import PhrasePicker, SEPicker
 from .streams import CircularStream, MultiStream
 from .players import SEPlayer
