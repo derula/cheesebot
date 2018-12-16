@@ -1,6 +1,6 @@
 from glob import glob
 from random import randint
-from signal import getsignal, signal, SIGTERM, SIGHUP, SIGINT
+from signal import getsignal, signal, SIGTERM, SIGINT
 from threading import Thread, Event, Timer
 
 from . import SEPicker
@@ -14,7 +14,7 @@ class SEPlayer(Thread):
         self.__dying = Event()
         self.__picker = picker
 
-        for sig in (SIGTERM, SIGHUP, SIGINT):
+        for sig in (SIGTERM, SIGINT):
             old_handler = getsignal(sig)
 
             def stop(signo, _frame):
