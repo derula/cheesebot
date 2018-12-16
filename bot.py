@@ -1,14 +1,4 @@
-import asyncio
-import audioop
-import glob
-import logging
-import math
-import random
-import inspect
-import io
 import os
-import signal
-import threading
 
 import discord
 import tinydb
