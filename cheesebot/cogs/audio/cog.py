@@ -18,8 +18,9 @@ class SEPicker(Picker):
         return glob('{}/*.raw'.format(self.__path))
 
 class AudioCog(CheeseCog):
-    def __init__(self, bot: CheeseBot, bgm: str, se_picker: SEPicker):
+    def __init__(self, bot: CheeseBot, voice_channel: str, bgm: str, se_picker: SEPicker):
         super().__init__(bot)
+        self.__voice_channel = voice_channel
         self.__bgm = bgm
         self.__se_picker = se_picker
 
@@ -30,14 +31,14 @@ class AudioCog(CheeseCog):
             print('Now playing spoopy music in {}'.format(channel.name))
             SEPlayer(stream, self.__se_picker).start()
         else:
-            print('Voice channel "{}" not found.'.format(self.bot.config['voice_channel']))
+            print('Voice channel "{}" not found.'.format(self.__voice_channel))
 
     async def __setup_bgm(self) -> (Channel, MultiStream):
         channel = None  # type: discord.Channel
 
         for server in self.bot.servers:
             channel = utils.find(
-                lambda c: c.name.find(self.bot.config['voice_channel']) >= 0 and
+                lambda c: c.name.find(self.__voice_channel) >= 0 and
                         c.type is ChannelType.voice,
                 server.channels
             )
