@@ -47,5 +47,3 @@ class Config(dict):
         self.update(new_config)
         for key in keys_to_delete:
             del self[key]
-
-
