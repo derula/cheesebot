@@ -13,14 +13,14 @@ import threading
 import discord
 import tinydb
 
-from cheesebot import Picker, SEPlayer, CircularStream, MultiStream
+from cheesebot import Config, Picker, SEPlayer, CircularStream, MultiStream
 
 async def setup_bgm() -> (discord.Channel, MultiStream):
     channel = None  # type: discord.Channel
 
     for server in client.servers:
         channel = discord.utils.find(
-            lambda c: c.name.find('Ch\'sebur\'gah') >= 0 and
+            lambda c: c.name.find(config['voice_channel']) >= 0 and
                       c.type is discord.ChannelType.voice,
             server.channels
         )
@@ -53,6 +53,7 @@ def load_phrases():
 db = tinydb.TinyDB('data/storage.json')
 phrases = db.table('phrases')
 phrase_picker = Picker(load_phrases)
+config = Config(db.table('config'))
 
 client = discord.Client()
 
@@ -64,11 +65,11 @@ async def on_ready():
         print('Now playing spoopy music in {}'.format(channel.name))
         SEPlayer(stream, 'data/se').start()
     else:
-        print('Ch\'sebur\'gah voice room not found.')
+        print('Voice channel "{}" not found.'.format(config['voice_channel']))
 
 @client.event
 async def on_message(message):
     if message.content.find(client.user.mention) >= 0:
         await client.send_message(message.channel, phrase_picker.pick())
 
-client.run(os.environ.get('CHSEBURGAH_SECRET'))
+client.run(config['discord_token'])
