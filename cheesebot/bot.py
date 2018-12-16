@@ -1,8 +1,8 @@
 from discord.ext.commands import Bot
 from tinydb import TinyDB, Query
 
-from . import Config, PhrasePicker, SEPicker
-from .cogs import MentionCog, AudioCog
+from . import Config
+from .cogs import PhrasePicker, MentionCog, SEPicker, AudioCog
 
 class CheeseBot(Bot):
     def __init__(self, data_path: str):

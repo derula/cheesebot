@@ -3,7 +3,8 @@ from random import randint
 from signal import getsignal, signal, SIGTERM, SIGHUP, SIGINT
 from threading import Thread, Event, Timer
 
-from . import SEPicker, MultiStream
+from . import SEPicker
+from .streams import MultiStream
 
 class SEPlayer(Thread):
     def __init__(self, stream: MultiStream, picker: SEPicker):

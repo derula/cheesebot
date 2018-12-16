@@ -1,27 +1,21 @@
-import asyncio
+from glob import glob
 from os import stat
 
 from discord import Channel, ChannelType, VoiceClient, utils
 from discord.voice_client import StreamPlayer
 
-from . import CheeseBot, PhrasePicker, SEPicker, SEPlayer, CircularStream, MultiStream
+from .. import CheeseBot, CheeseCog
+from ... import Picker
+from .se_player import SEPlayer
+from .streams import CircularStream, MultiStream
 
-class CheeseCog():
-    def __init__(self, bot: CheeseBot) -> None:
-        self.__bot = bot
+class SEPicker(Picker):
+    def __init__(self, path: str) -> None:
+        self.__path = path
+        super().__init__()
 
-    @property
-    def bot(self):
-        return self.__bot
-
-class MentionCog(CheeseCog):
-    def __init__(self, bot: CheeseBot, phrase_picker: PhrasePicker):
-        super().__init__(bot)
-        self.__phrase_picker = phrase_picker
-
-    async def on_message(self, message):
-        if message.content.find(self.bot.user.mention) >= 0:
-            await self.bot.send_message(message.channel, self.__phrase_picker.pick())
+    def _all_items(self):
+        return glob('{}/*.raw'.format(self.__path))
 
 class AudioCog(CheeseCog):
     def __init__(self, bot: CheeseBot, bgm: str, se_picker: SEPicker):
