@@ -1,8 +1,15 @@
 from tinydb import Query
 from tinydb.database import Table
 
-from . import CheeseCog
 from .. import Picker
+
+class CheeseCog():
+    def __init__(self, bot: 'cheesebot.CheeseBot') -> None:
+        self.__bot = bot
+
+    @property
+    def bot(self):
+        return self.__bot
 
 Phrase = Query()
 
