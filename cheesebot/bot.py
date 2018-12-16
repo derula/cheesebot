@@ -1,12 +1,17 @@
 from discord.ext.commands import Bot
 from tinydb import TinyDB, Query
+from tinydb.storages import JSONStorage
+from tinydb.middlewares import CachingMiddleware
 
 from . import Config
 from .cogs import CogFactory
 
 class CheeseBot(Bot):
     def __init__(self, data_path: str):
-        self.__db = TinyDB('{}/storage.json'.format(data_path))
+        self.__db = TinyDB(
+            path='{}/storage.json'.format(data_path),
+            storage=CachingMiddleware(JSONStorage)
+        )
         self.__config = Config(self.__db.table('config'))
         self.__data_path = data_path
         super().__init__('🧀')
