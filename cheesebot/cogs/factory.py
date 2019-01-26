@@ -22,4 +22,7 @@ class CogFactory():
 
     def __create_mention_cog(self) -> MentionCog:
         from .cogs import PhrasePicker
-        return MentionCog(self.__bot, PhrasePicker(self.__bot.db.table('phrases')))
+        return MentionCog(self.__bot, PhrasePicker(
+            self.__bot.db.table('phrases'),
+            self.__bot.config['phrase_sets'][0] # TODO: one phrase picker per set
+        ))

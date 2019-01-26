@@ -14,12 +14,13 @@ class CheeseCog():
 Phrase = Query()
 
 class PhrasePicker(Picker):
-    def __init__(self, table: Table) -> None:
+    def __init__(self, table: Table, phrase_set: str) -> None:
         self.__table = table
+        self.__set = phrase_set
         super().__init__()
 
     def _all_items(self):
-        return map(lambda row: row['content'], self.__table.search(Phrase.language == 'odan'))
+        return map(lambda row: row['content'], self.__table.search(Phrase.set == self.__set))
 
 class MentionCog(CheeseCog):
     def __init__(self, bot: 'cheesebot.CheeseBot', phrase_picker: PhrasePicker):
