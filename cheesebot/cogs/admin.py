@@ -55,17 +55,6 @@ class StrDict(dict):
             super().__init__(_dict_parse_error)
 
 class AdminCog(CheeseCog):
-    __meta = {
-        'config': {
-            'required': ['level_min'],
-            'unique': ['level_min'],
-        },
-        'phrases': {
-            'required': ['content', 'set'],
-            'unique': ['content']
-        }
-    }
-
     @command()
     async def db_inspect(self, table: str = None, *, where: StrDict = StrDict('')) -> None:
         query = await self.__get_query(table, where)
