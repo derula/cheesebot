@@ -123,6 +123,64 @@ class AdminCog(CheeseCog):
 
         await self.bot.say('Effective value for config `{}` at level {} set to: `{}`'.format(key, level, value))
 
+    @command()
+    async def phrase_add(self, set_name: str, content: str, notes: str = None) -> None:
+        table = self.bot.db.table('phrases')
+        existing = table.get(q.content == content)
+        if existing:
+            await self.bot.say('Phrase already exists in set `{}`! Be a little more creative :)'.format(existing['set']))
+            return
+
+        table.insert({'set': set_name, 'content': content, 'notes': notes})
+        await self.bot.say('Added the phrase to set `{}`.'.format(set_name))
+
+    @command()
+    async def phrase_move(self, content: str, set_name: str) -> None:
+        if not self.bot.db.table('phrases').update({'set': set_name}, q.content == content):
+            await self.bot.say('Phrase could _not_ be moved to set `{}`.'.format(set_name))
+            return
+
+        await self.bot.say('Phrase was successfully moved to set `{}`.'.format(set_name))
+
+    @command()
+    async def phrase_annotate(self, content: str, notes: str) -> None:
+        if not self.bot.db.table('phrases').update({'notes': notes}, q.content == content):
+            await self.bot.say('Notes could _not_ be set for the given phrase.')
+            return
+
+        await self.bot.say('Notes were successfully set for the given phrase.')
+
+    @command()
+    async def phrase_remove(self, content: str) -> None:
+        if not self.bot.db.table('phrases').remove(q.content == content):
+            await self.bot.say('Phrase could _not_ be removed.')
+            return
+
+        await self.bot.say('Phrase was successfully removed.')
+
+    @command()
+    async def phrase_info(self, content: str) -> None:
+        info = self.bot.db.table('phrases').get(q.content == content)
+        if not info:
+            await self.bot.say('The given phrase doesn\'t exist in any phrase set.')
+            return
+
+        await self.bot.say('The given phrase is part of the phrase set `{}`.{}'.format(
+            info['set'], info['notes'] and '\nThe following notes were provided:\n```̇{}```'.format(info['notes']) or ''
+        ))
+
+    @command()
+    async def phrase_set_move(self, old_name: str, new_name: str) -> None:
+        ids = self.bot.db.table('phrases').update({'set': new_name}, q.set == old_name)
+
+        await self.bot.say('{} phrases were moved from step `{}` to step `{}`.'.format(len(ids), old_name, new_name))
+
+    @command()
+    async def phrase_set_remove(self, set_name: str) -> None:
+        ids = self.bot.db.table('phrases').remove(q.set == set_name)
+
+        await self.bot.say('{} phrase were removed from step `{}`.'.format(len(ids), set_name))
+
     async def __get_query(self, table: str, where: StrDict) -> Optional[list]:
         all_tables = filter(lambda s: s[0] != '_', self.bot.db.tables())
         if table is None:
