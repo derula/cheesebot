@@ -38,6 +38,9 @@ class Value():
     def listify(self, string: str) -> list:
         return string.split(',')
 
+    def __str__(self):
+        return str(self.value)
+
 class StrDict(dict):
     __scanner = re.Scanner([(r'\w+=(?:[^ ]*|{})(?: +|$)'.format(_value), lambda a, v: _split_key_value(v))])
 
@@ -100,6 +103,25 @@ class AdminCog(CheeseCog):
             await self.bot.say('Oops! Something went wrong!\nNote that some operations don\'t expect a value.')
             return
         await self.bot.say('{} records in `{}` have been updated.'.format(len(ids), table))
+
+    @command()
+    async def config_get(self, key: str, level: int = 0) -> None:
+        value = self.bot.config.at_level(level).get(key, _config_unset)
+        if value is _config_unset:
+            await self.bot.say('Config `{}` not defined for level {} or below.'.format(key, level))
+            return
+
+        await self.bot.say('Effective value for config `{}` at level {}: `{}`'.format(key, level, value))
+
+    @command()
+    async def config_set(self, key: str, value: Value, level: int = 0) -> None:
+        try:
+            self.bot.config.at_level(level)[key] = value.value
+        except:
+            await self.bot.say('Failed setting config `{}` to `{}` for level {} and up.'.format(key, value, level))
+            return
+
+        await self.bot.say('Effective value for config `{}` at level {} set to: `{}`'.format(key, level, value))
 
     async def __get_query(self, table: str, where: StrDict) -> Optional[list]:
         all_tables = filter(lambda s: s[0] != '_', self.bot.db.tables())
