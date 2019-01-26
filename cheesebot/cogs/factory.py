@@ -1,4 +1,4 @@
-from . import CheeseCog, MentionCog, AudioCog
+from . import CheeseCog, MentionCog, AudioCog, AdminCog
 
 class CogFactory():
     def __init__(self, bot: 'cheesebot.CheeseBot') -> None:
@@ -6,6 +6,7 @@ class CogFactory():
         self.__factories = {
             AudioCog: self.__create_audio_cog,
             MentionCog: self.__create_mention_cog,
+            AdminCog: self.__create_admin_cog,
         }
 
     def __call__(self, cog_type: type) -> CheeseCog:
@@ -26,3 +27,6 @@ class CogFactory():
             self.__bot.db.table('phrases'),
             self.__bot.config['phrase_sets'][0] # TODO: one phrase picker per set
         ))
+
+    def __create_admin_cog(self) -> AdminCog:
+        return AdminCog(self.__bot)
