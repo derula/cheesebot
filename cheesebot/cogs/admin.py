@@ -55,6 +55,12 @@ class StrDict(dict):
             super().__init__(_dict_parse_error)
 
 class AdminCommand(Command):
+    def can_run(self, ctx: Context) -> bool:
+        if ctx.message.channel.name != ctx.bot.config.get('admin_channel'):
+            return False
+
+        return super().can_run(ctx)
+
     @property
     def cog_name(self) -> str:
         for cls in self.instance.__class__.__mro__[1:]:
