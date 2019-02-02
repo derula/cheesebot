@@ -8,7 +8,7 @@ from .cogs import CogFactory
 class CheeseBot(Bot):
     def __init__(self, data_path: str):
         self.__db = DB('{}/storage.json'.format(data_path))
-        self.__config = Config(self.__db.table('config'))
+        self.__config = Config(self)
         self.__data_path = data_path
         super().__init__('🧀')
         self.__cog_factory = CogFactory(self)
