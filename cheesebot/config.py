@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Union
 
 from tinydb import Query
@@ -6,10 +7,28 @@ from tinydb.database import Table
 ConfigQuery = Query()
 ConfigEntry = Union[str, int, float, bool]
 
+def _has_handlers(cls):
+    for method in cls.__dict__.values():
+        for key in getattr(method, 'handles', []):
+            cls._handlers[key].append(method)
+    return cls
+
+def _handles(key: str) -> callable:
+    def decorator(func: callable) -> callable:
+        if not hasattr(func, 'handles'):
+            func.handles = []
+        func.handles.append(key)
+        return func
+    return decorator
+@_has_handlers
 class Config(dict):
-    def __init__(self, table: Table, level: int=0) -> None:
+    _handlers = defaultdict(list)
+
+    def __init__(self, bot: 'CheeseBot', level: int=0) -> None:
         super().__init__()
-        self.__table = table
+        self.__bot = bot
+        self.__table = bot.db.table('config')
+        self._handlers = {k: [m.__get__(self) for m in v] for k, v in self._handlers.items()}
         self.level = level
 
     def at_level(self, level: int) -> 'Config':
@@ -24,6 +43,7 @@ class Config(dict):
         super().__setitem__(key, value)
         doc = {key: value, 'level_min': self.level}
         self.__table.upsert(doc, ConfigQuery.level_min == self.level)
+        self.__handle(key, value)
 
     @property
     def level(self) -> int:
@@ -36,6 +56,7 @@ class Config(dict):
         entries = self.__table.search(ConfigQuery.level_min <= value)
 
         # Collect config in new dict to avoid reaching an inconsistent state
+        old_config = self.copy()
         new_config = {}
         for entry in sorted(entries, key=lambda entry: entry['level_min']):
             new_config.update(entry)
@@ -47,3 +68,13 @@ class Config(dict):
         self.update(new_config)
         for key in keys_to_delete:
             del self[key]
+
+        # Call all handlers for now-current values
+        for key in old_config.keys():
+            new_value = self.get(key)
+            if old_config[key] != new_value:
+                self.__handle(key, new_value)
+
+    def __handle(self, key: str, value: ConfigEntry):
+        for meth in self._handlers.get(key, []):
+            meth(value)
