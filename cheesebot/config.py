@@ -1,3 +1,4 @@
+from asyncio import coroutine, get_event_loop, ensure_future
 from collections import defaultdict
 from typing import Union
 
@@ -20,6 +21,10 @@ def _handles(key: str) -> callable:
         func.handles.append(key)
         return func
     return decorator
+
+def _await(coro: coroutine) -> None:
+    get_event_loop().call_soon_threadsafe(ensure_future, coro)
+
 @_has_handlers
 class Config(dict):
     _handlers = defaultdict(list)
@@ -78,3 +83,10 @@ class Config(dict):
     def __handle(self, key: str, value: ConfigEntry):
         for meth in self._handlers.get(key, []):
             meth(value)
+
+    @_handles('bot_name')
+    def __update_bot_name(self, new_name: str) -> None:
+        for server in self.__bot.servers:
+            member = server.get_member(self.__bot.user.id)
+            break
+        _await(self.__bot.change_nickname(member, new_name))
