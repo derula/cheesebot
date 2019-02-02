@@ -11,6 +11,9 @@ class CheeseCog():
     def bot(self):
         return self.__bot
 
+    def shutdown(self, signal: int):
+        pass
+
 Phrase = Query()
 
 class PhrasePicker(Picker):

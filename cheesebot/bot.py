@@ -1,3 +1,5 @@
+from signal import getsignal, signal, SIGTERM, SIGINT
+
 from discord.ext.commands import Bot
 
 from . import Config, DB
@@ -10,6 +12,18 @@ class CheeseBot(Bot):
         self.__data_path = data_path
         super().__init__('🧀')
         self.__cog_factory = CogFactory(self)
+
+        for sig in (SIGTERM, SIGINT):
+            old_handler = getsignal(sig)
+
+            def stop(signo, _frame):
+                for cog in self.cogs.values():
+                    cog.shutdown(signo)
+                self.db.close()
+                if callable(old_handler):
+                    old_handler(signo, _frame)
+
+            signal(sig, stop)
 
     @property
     def db(self) -> DB:
